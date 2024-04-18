@@ -1,20 +1,22 @@
 #!/bin/bash
 
-deepspeed --include localhost:2 llava/train/train.py \
-    --lora_enable True --lora_r 64 --lora_alpha 256 --mm_projector_lr 2e-5 \
-    --deepspeed ./scripts/zero3.json \
+
+
+
+# Set the prompt and model versions directly in the command
+CUDA_VISIBLE_DEVICES=012 deepspeed llava/train/train.py \
     --model_name_or_path /data/majunpeng/LLaVA/llava-v1.5-7b \
     --version v1 \
-    --data_path /data/majunpeng/LLaVA/playground/data/textvqa.json \
+    --data_path ./playground/data/llava_v1_5_mix665k.json \
     --image_folder ./playground/data \
     --vision_tower /data/majunpeng/LLaVA/openai/clip-vit-large-patch14-336 \
-    --mm_projector_type mlp2x_gelu \
+    --pretrain_mm_mlp_adapter /data/majunpeng/LLaVA/llava-v1.5-7b/mm_projector.bin \
+        --mm_projector_type mlp2x_gelu \
     --mm_vision_select_layer -2 \
     --mm_use_im_start_end False \
     --mm_use_im_patch_token False \
     --image_aspect_ratio pad \
     --group_by_modality_length True \
-    --bf16 False\
     --fp16 True \
     --output_dir /data/majunpeng/LLaVA/checkpoints/result \
     --num_train_epochs 1 \
@@ -31,8 +33,8 @@ deepspeed --include localhost:2 llava/train/train.py \
     --lr_scheduler_type "cosine" \
     --logging_steps 1 \
     --tf32 False \
+    --dataloader_num_workers 4 \
     --model_max_length 2048 \
     --gradient_checkpointing True \
-    --dataloader_num_workers 4 \
     --lazy_preprocess True \
-    --report_to none
+    --report_to wandb \

@@ -1,3 +1,5 @@
+import sys
+sys.path.append("/data/majunpeng/LLaVA")
 from llava.train.train import train
 
 if __name__ == "__main__":
